@@ -10,6 +10,7 @@ import gc
 import os
 import timeit
 import hashlib
+import pefile  # Import pefile module
 
 
 app = Flask(__name__)
@@ -115,36 +116,60 @@ def download():
     norm_row_ = normalized_row(row)
     norm_row = []
     for nr in norm_row_:
-        norm_row.append(nr[0])
-    # ###Imports
+        norm_row.append(nr[0])    # ###Imports
     with open(os.path.join(original_path, 'dlls.csv'), 'r') as dlls:
         csv_reader = csv.reader(dlls)
         col_dlls = next(csv_reader)
-    del col_dlls[0]
-    del col_dlls[-1]
+        del col_dlls[0]
+        del col_dlls[-1]
+    
     with open(os.path.join(original_path, 'functions.csv'), 'r') as func:
         csv_reader = csv.reader(func)
         col_func = next(csv_reader)
-    del col_func[0]
-    del col_func[-1]
-    imports = extract_imports(os.path.join('./dm/transferedFiles', str(seed)), col_dlls, col_func)
-
+        del col_func[0]
+        del col_func[-1]
+      # Get file path for more readable code
+    file_path = os.path.join('./dm/transferedFiles', str(seed))
+    
+    # Verify if the file is a valid PE file before proceeding
+    try:
+        # Just try to open it to check if it's a PE file
+        test_pe = pefile.PE(file_path)
+        has_valid_pe = True
+    except Exception as e:
+        print(f"File is not a valid PE file: {str(e)}")
+        has_valid_pe = False
+        
+    # If it's not a valid PE file, create empty imports
+    if not has_valid_pe:
+        print("Creating empty imports list since file is not a valid PE file")
+        imports = []
+        for _ in col_dlls:
+            imports.append(0)  # Add 0 for each DLL
+        for _ in col_func:
+            imports.append(0)  # Add 0 for each function
+    else:
+        # Proceed with normal import extraction
+        imports = extract_imports(file_path, col_dlls, col_func)
+    
     # ###disassemble
-    sequence = extract_sequence(os.path.join('./dm/transferedFiles', str(seed)))
-
-    # ###images
-    img_list = extract_img(os.path.join('./dm/transferedFiles', str(seed)))
+    sequence = extract_sequence(file_path)    # ###images
+    img_list = extract_img(file_path)
     global analysis
     response = make_response()
     if norm_row is None or isinstance(norm_row, str):
         response.data = 'failed to extract features: 4grams'
         return response
-    if imports is None or isinstance(imports, str):
+    
+    if imports is None:
+        print(f"Import extraction issue: imports is None")
         response.data = 'failed to extract features: imports'
         return response
+    
     if sequence is None or isinstance(sequence, str):
         response.data = 'failed to extract features: sequence'
         return response
+    
     if img_list is None or isinstance(img_list, str):
         response.data = 'failed to extract features: images'
         return response
@@ -152,8 +177,7 @@ def download():
     with open(os.path.join('./dm/models/encoders', 'grams_columns_parts.json'), 'r') as gcp:
         columns_parts = json.load(gcp)
 
-    global models
-    #encoded_grams = evaluate_g_encoder(norm_row, columns, columns_parts, models)
+    global models    #encoded_grams = evaluate_g_encoder(norm_row, columns, columns_parts, models)
     encoded_imports = evaluate_df_encoder(imports, models)
     gc.collect()
     cnn_pre = models[0].predict(img_list)
@@ -161,14 +185,24 @@ def download():
     #grams_pre = models[2].predict(encoded_grams)
     grams_pre = [[0.]]
     imp_pre = models[1].predict(encoded_imports)
+    
     pre_prediction = joined_prediction([np.mean(cnn_pre), np.mean(seq_pre), grams_pre[0][0], imp_pre[0][0]])
+    
     rect = rectification(norm_row, imports, sequence, img_list, grams_pre, imp_pre, seq_pre, cnn_pre)
     end = timeit.timeit()
+    
     analysis['pre_prediction'] = float(pre_prediction)
     analysis['rectification'] = rect
     analysis['rectified'] = pre_prediction + rect
     analysis['grams'] = [x for x in norm_row]
-    analysis['imports'] = str(imports_json(os.path.join('./dm/transferedFiles', str(seed))))
+    
+    # Check if it's a valid PE file before calling imports_json
+    if has_valid_pe:
+        imports_info = imports_json(file_path)
+    else:
+        imports_info = "Not a valid PE file"
+    analysis['imports'] = str(imports_info)
+    
     analysis['file_size'] = file_size / 1000
     analysis['time'] = (end - start)
     sha256_hash = hashlib.sha256()

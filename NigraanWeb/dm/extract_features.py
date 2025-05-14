@@ -25,6 +25,10 @@ def grams_rf(freq):
     summ = 0
     for g in freq:
         summ += freq[g]
+    if summ == 0:
+        # Return the original frequency dictionary if sum is zero
+        # This avoids division by zero
+        return freq
     for g in freq:
         freq[g] = freq[g] / summ
     return freq
@@ -52,48 +56,85 @@ def extract_imports(file_path, dlls, functions):
         functions_used[function] = 0
     try:
         exe = pefile.PE(file_path)
-    except:
+    except Exception as e:
+        print(f"PE parsing error: {str(e)}")
         return 'parsing error'
+    
+    # Check if the import directory exists
+    if not hasattr(exe, 'DIRECTORY_ENTRY_IMPORT'):
+        try:
+            # Try to parse imports if they exist but weren't parsed automatically
+            exe.parse_data_directories(directories=[pefile.DIRECTORY_ENTRY['IMAGE_DIRECTORY_ENTRY_IMPORT']])
+        except Exception as e:
+            print(f"No import directory found: {str(e)}")
+            # If the file genuinely has no imports, return empty lists
+            return list(functions_used.values()) + list(dlls_used.values())
+    
     try:
-        for entry in exe.DIRECTORY_ENTRY_IMPORT:
-            dll = entry.dll.decode('utf-8').lower()
-            try:
-                dlls_used[dll] = 1
-            except:
-                pass
-            for func in entry.imports:
-                if func.name is not None:
-                    func_name = func.name.decode('utf-8').lower()
-                    if dll+func_name in functions:
-                        functions_used[dll+func_name] = 1
-                else:
-                    func_ordinal = str(func.ordinal)
-                    if dll+func_ordinal in functions:
-                        functions_used[dll+func_ordinal] = 1
+        # Make sure DIRECTORY_ENTRY_IMPORT exists after trying to parse it
+        if hasattr(exe, 'DIRECTORY_ENTRY_IMPORT'):
+            for entry in exe.DIRECTORY_ENTRY_IMPORT:
+                dll = entry.dll.decode('utf-8').lower()
+                try:
+                    dlls_used[dll] = 1
+                except Exception as e:
+                    print(f"DLL not in list: {dll}")
+                    pass
+                
+                for func in entry.imports:
+                    if func.name is not None:
+                        func_name = func.name.decode('utf-8').lower()
+                        if dll+func_name in functions:
+                            functions_used[dll+func_name] = 1
+                    else:
+                        func_ordinal = str(func.ordinal)
+                        if dll+func_ordinal in functions:
+                            functions_used[dll+func_ordinal] = 1
+        
         return list(functions_used.values()) + list(dlls_used.values())
-    except:
-        return 'no imports'
+    except Exception as e:
+        print(f"Error extracting imports: {str(e)}")
+        # Instead of returning 'no imports', return the empty list we initialized
+        # This will allow the program to continue even if there are no imports
+        return list(functions_used.values()) + list(dlls_used.values())
 
 
 def imports_json(file_path):
     imports = {}
     try:
         exe = pefile.PE(file_path)
-    except:
+    except Exception as e:
+        print(f"imports_json PE parsing error: {str(e)}")
         return 'parsing error'
+        
+    # Check if the import directory exists
+    if not hasattr(exe, 'DIRECTORY_ENTRY_IMPORT'):
+        try:
+            # Try to parse imports if they exist but weren't parsed automatically
+            exe.parse_data_directories(directories=[pefile.DIRECTORY_ENTRY['IMAGE_DIRECTORY_ENTRY_IMPORT']])
+        except Exception as e:
+            print(f"imports_json No import directory found: {str(e)}")
+            return {}
+    
     try:
-        for entry in exe.DIRECTORY_ENTRY_IMPORT:
-            dll = str(entry.dll.decode('utf-8').lower())
-            imports[dll] = []
-            for func in entry.imports:
-                if func.name is not None:
-                    func_name = str(func.name.decode('utf-8').lower())
-                    imports[dll].append(func_name)
-                else:
-                    func_ordinal = str(func.ordinal)
-                    imports[dll].append(func_ordinal)
-        return imports
-    except:
+        # Make sure DIRECTORY_ENTRY_IMPORT exists after trying to parse it
+        if hasattr(exe, 'DIRECTORY_ENTRY_IMPORT'):
+            for entry in exe.DIRECTORY_ENTRY_IMPORT:
+                dll = str(entry.dll.decode('utf-8').lower())
+                imports[dll] = []
+                for func in entry.imports:
+                    if func.name is not None:
+                        func_name = str(func.name.decode('utf-8').lower())
+                        imports[dll].append(func_name)
+                    else:
+                        func_ordinal = str(func.ordinal)
+                        imports[dll].append(func_ordinal)
+            return imports
+        else:
+            print("No imports found after attempting to parse directories")
+            return {}
+    except Exception as e:
+        print(f"imports_json error extracting imports: {str(e)}")
         return {}
 
 
@@ -321,7 +362,8 @@ def quick_disassemble(path, depth=128000):
         exe = pefile.PE(path)
         gr = fine_disassemble(exe, depth)
         return gr
-    except:
+    except Exception as e:
+        print(f"quick_disassemble error: {str(e)}")
         return None
 
 
@@ -342,52 +384,76 @@ def extract_sequence(path):
     for l, e in zip(labels, encoded_labels):
         encode_dict[l] = e
 
-    count = 0
     sequence = quick_disassemble(path)
-    if sequence is not None:
-        del sequence[0]
-        for s in sequence:
-            if isinstance(s, str):
-                count += 1
-            else:
-                count += s[1]
+    
+    # If quick_disassemble returns None (error or not a PE file)
+    # Create a default sequence with the "other" label
+    if sequence is None:
+        print(f"Creating default sequence for non-PE file: {path}")
+        # Create a minimal default sequence with just "other" category
         steps = 128
         vect = 49
-        data_array = np.zeros((int(count / steps) + 1, steps, vect), dtype='float32')
-        length = steps
-        i, j, k = (0, 0, 0)
-        for s in sequence:
-            if isinstance(s, str):
-                data_array[i, j] = encode_dict[s] + 0.
+        # Create a data array with all zeros (representing "other" category)
+        default_data = np.zeros((1, steps, vect), dtype='float32')
+        # Set the "other" category for the first element (gives model something to work with)
+        default_data[0, 0] = encode_dict["other"]
+        return default_data
+        
+    # Normal processing for valid sequences
+    count = 0
+    del sequence[0]  # Remove the first element
+    for s in sequence:
+        if isinstance(s, str):
+            count += 1
+        else:
+            count += s[1]
+    steps = 128
+    vect = 49
+    data_array = np.zeros((int(count / steps) + 1, steps, vect), dtype='float32')
+    length = steps
+    i, j, k = (0, 0, 0)
+    for s in sequence:
+        if isinstance(s, str):
+            data_array[i, j] = encode_dict[s] + 0.
+            j += 1
+            if j > length - 1:
+                j = 0
+                i += 1
+        else:
+            for _ in range(s[1]):
+                data_array[i, j] = encode_dict[s[0]] + 0.
                 j += 1
                 if j > length - 1:
                     j = 0
                     i += 1
-            else:
-                for _ in range(s[1]):
-                    data_array[i, j] = encode_dict[s[0]] + 0.
-                    j += 1
-                    if j > length - 1:
-                        j = 0
-                        i += 1
-        return data_array
-    else:
-        return None
+    return data_array
 
 
 def extract_img(path, h=64, w=64):
-    images = []
-    with open(path, 'rb') as img_set:
-        img_arr = img_set.read(h * w)
-        while img_arr:
-            if img_arr not in images and len(img_arr) == h * w:
-                images.append(img_arr)
+    try:
+        images = []
+        with open(path, 'rb') as img_set:
             img_arr = img_set.read(h * w)
-    len_img = len(images)
-    img_list = np.zeros(shape=(len_img, h, w, 1), dtype=np.uint8)
-    for j in range(len(images)):
-        img_list[j, :, :, 0] = np.reshape(list(images[j]), (h, w))
-    img_list = img_list.astype('float32')
-    img_list /= 255
-    return img_list
+            while img_arr:
+                if img_arr not in images and len(img_arr) == h * w:
+                    images.append(img_arr)
+                img_arr = img_set.read(h * w)
+        
+        # If no valid images were found, return a default empty array
+        if not images:
+            print(f"No valid images found in file: {path}")
+            # Return a single black image (all zeros)
+            return np.zeros(shape=(1, h, w, 1), dtype='float32')
+            
+        len_img = len(images)
+        img_list = np.zeros(shape=(len_img, h, w, 1), dtype=np.uint8)
+        for j in range(len(images)):
+            img_list[j, :, :, 0] = np.reshape(list(images[j]), (h, w))
+        img_list = img_list.astype('float32')
+        img_list /= 255
+        return img_list
+    except Exception as e:
+        print(f"Error extracting images: {str(e)}")
+        # Return a single black image as fallback
+        return np.zeros(shape=(1, h, w, 1), dtype='float32')
 
