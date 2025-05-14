@@ -4,8 +4,6 @@
 
 Nigraan Antivirus is an advanced antivirus system leveraging deep learning to analyze Windows Portable Executable (PE) files and identify malicious software with high accuracy. This project represents a comprehensive implementation of state-of-the-art techniques in AI-based malware detection.
 
-![Nigraan Antivirus](https://via.placeholder.com/800x400?text=Nigraan+Antivirus)
-
 ## Table of Contents
 
 - [Overview](#overview)
