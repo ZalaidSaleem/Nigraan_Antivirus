@@ -1,0 +1,48 @@
+/* Nigraan custom theme */
+:root {
+    --primary-color: #00004f;
+    --secondary-color: #1a1a73;
+    --accent-color: #ffffff;
+}
+
+.logo-header[data-background-color="blue"] {
+    background: var(--primary-color) !important;
+}
+
+.navbar-header[data-background-color="blue2"] {
+    background: var(--primary-color) !important;
+}
+
+.bg-primary-gradient {
+    background: var(--primary-color) !important;
+}
+
+.sidebar {
+    background: var(--primary-color) !important;
+}
+
+.btn-primary {
+    background: var(--primary-color) !important;
+    border: none !important;
+}
+
+.card-header {
+    background: var(--primary-color) !important;
+    color: white !important;
+}
+
+.sidebar .nav .nav-item a {
+    color: white !important;
+}
+
+.sidebar .nav .nav-item a i {
+    color: white !important;
+}
+
+.sidebar .nav .nav-item a p {
+    color: white !important;
+}
+
+.sidebar .nav .nav-section {
+    color: rgba(255, 255, 255, 0.8) !important;
+}

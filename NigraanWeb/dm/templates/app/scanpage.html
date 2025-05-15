@@ -15,49 +15,29 @@
 			active: function() {
 				sessionStorage.fonts = true;
 			}
-		});
-	</script>
+		});	</script>
 	<link rel="stylesheet" href="../../static/assets/css/bootstrap.min.css">
 	<link rel="stylesheet" href="../../static/assets/css/atlantis.min.css">
+	<link rel="stylesheet" href="../../static/assets/css/nigraan-custom.css">
 	<style>
-		:root {
-			--primary-color: #6a1b9a;
-			--secondary-color: #9c27b0;
-			--gradient-start: #6a1b9a;
-			--gradient-end: #9c27b0;
+		/* Additional page-specific styles */
+		.card-body {
+			background-color: #f8f9fa;
 		}
-
-		.logo-header {
-			background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end)) !important;
-		}
-
-		.navbar-header {
-			background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end)) !important;
-		}
-
-		.bg-primary-gradient {
-			background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end)) !important;
-		}
-
-		.sidebar {
-			background: linear-gradient(180deg, var(--gradient-start), var(--gradient-end)) !important;
-		}
-
 		.btn-primary {
-			background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end)) !important;
+			background: var(--primary-color) !important;
 			border: none !important;
 		}
 
 		.card-header {
-			background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end)) !important;
+			background: var(--primary-color) !important;
 			color: white !important;
 		}
 	</style>
 </head>
-<body>
-	<div class="wrapper bg-white">
+<body>	<div class="wrapper bg-white">
 		<div class="main-header">
-			<div class="logo-header" data-background-color="light-blue2">
+			<div class="logo-header" data-background-color="blue">
 				<a href="index.html" class="nav-link">
 					<h3 class="text-white">
                         Nigraan
@@ -70,7 +50,7 @@
 					</button>
 				</div>
 			</div>
-			<nav class="navbar navbar-header navbar-expand-lg" data-background-color="light-blue2">
+			<nav class="navbar navbar-header navbar-expand-lg" data-background-color="blue2">
 				<div class="container-fluid">
 					<ul class="navbar-nav topbar-nav ml-md-auto align-items-center">
 						<li class="nav-item">
