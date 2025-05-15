@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, make_response, jsonify
+from flask import Flask, render_template, request, make_response, jsonify, redirect
 import json
 from .load_data import read_chunk, read_chunk_c
 import os.path
@@ -49,8 +49,11 @@ def index():
     if analysis_page:
         return render_template('app/index.html', name='home')
     else:
-        return render_template('app/scanpage.html')
+        return redirect('/scan')
 
+@app.route('/scan')
+def scan():
+    return render_template('app/scanpage.html')
 
 @app.route('/dataset')
 def dataset():
