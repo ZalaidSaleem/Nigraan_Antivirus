@@ -354,6 +354,69 @@ The quality and diversity of the training dataset directly impact the effectiven
 - **Clean benign samples**: Reduces false positives on legitimate software
 - **Balanced representation**: Prevents bias toward either malicious or benign classification
 
+### Understanding the Analysis Charts
+
+The analysis board displays several visualizations to help interpret the scan results:
+
+#### 1. Probability Score Circles
+
+The three circles at the top of the analysis page represent:
+
+- **Initial Prediction** (First Circle): The raw malware probability score based on the combined model predictions before any rectification. Higher values indicate higher likelihood of malicious content.
+  
+- **Rectification Value** (Second Circle): The adjustment made after deeper analysis to reduce false positives. This value modifies the initial prediction to produce the final verdict.
+  
+- **Final Verdict** (Third Circle): The final malware probability score after all analysis and rectification. A score over 50% classifies the file as likely malicious.
+
+The circles are color-coded:
+- **Green**: Indicates benign classification (below 50%)
+- **Red**: Indicates malicious classification (above 50%)
+- **Blue**: Indicates rectification value (regardless of direction)
+
+#### 2. Byte N-Grams Frequency Distribution
+
+This line chart displays the distribution patterns of byte sequences (4-grams) found in:
+
+- **Red Line**: Typical distribution in benign files
+- **Orange Line**: Typical distribution in malware files
+- **Blue Line**: The current file being analyzed
+
+How to interpret this chart:
+- If the blue line follows a pattern similar to the orange line, the file may contain byte patterns common in malware
+- If the blue line follows the red line pattern, the file exhibits byte patterns more common in legitimate software
+- Significant deviations from both patterns may indicate unusual or packed code
+
+#### 3. Features Detail Chart
+
+This section provides a breakdown of specific features analyzed:
+
+- **4-grams Tab**: Shows detailed frequency information about specific byte patterns found in the file
+- **DLLs Tab**: Displays the imported libraries and functions, highlighting potentially suspicious API calls
+- **Images Tab**: Presents binary visualization, where the file's bytes are represented as a grayscale image
+- **Sequence Tab**: Shows the distribution of assembly instruction types and suspicious code patterns
+
+Each feature view includes explanatory text to help interpret the displayed information.
+
+#### Reading the "Features Detail" Chart
+
+When examining the Features Detail section:
+
+1. **DLL Imports**: 
+   - Look for combinations of system access APIs (file, registry, network) 
+   - Suspicious functions like process injection, keylogging, or network backdoors
+   - Uncommon DLLs or unexpected function combinations
+
+2. **4-grams Analysis**:
+   - Spikes in unusual byte patterns may indicate obfuscated or encrypted code
+   - Different malware families often have characteristic n-gram distributions
+   - Large numbers of rare n-grams can indicate polymorphic code
+
+3. **Binary Visualization**:
+   - Dark regions often represent zero bytes or repetitive patterns
+   - Bright, random-looking sections may indicate encrypted or compressed data
+   - Different file types have distinctive visual signatures
+   - Malware families often show recognizable visual patterns
+
 ## Installation
 
 ### Prerequisites
