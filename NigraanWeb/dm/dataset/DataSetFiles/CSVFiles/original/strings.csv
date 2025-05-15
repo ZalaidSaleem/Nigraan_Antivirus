@@ -1,0 +1,6 @@
+SampleName,String1,String2,String3,String4,String5
+Sample1,GetProcAddress,VirtualAlloc,CreateFileA,LoadLibraryA,WriteFile
+Sample2,RegCreateKeyExA,RegSetValueExA,GetModuleHandleA,CreateProcessA,CloseHandle
+Sample3,CreateMutexA,CreateEventA,WaitForSingleObject,SetEvent,ReleaseMutex
+Sample4,SendMessage,CreateWindowExA,RegisterClassExA,GetMessage,DispatchMessage
+Sample5,InternetOpenA,InternetOpenUrlA,InternetReadFile,HttpQueryInfoA,InternetCloseHandle

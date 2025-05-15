@@ -1,0 +1,6 @@
+SampleName,Opcode1,Opcode2,Opcode3,Opcode4,Opcode5
+Sample1,push,call,mov,jmp,ret
+Sample2,xor,add,sub,cmp,je
+Sample3,test,inc,dec,push,pop
+Sample4,mov,lea,call,ret,add
+Sample5,push,mov,call,test,jnz

@@ -1,0 +1,6 @@
+Name,MalwareStatus,FileSize,TimeStampOfCompilation,PackerDetected,NumberOfImports,NumberOfExports,NumSections
+Sample1,Malware,24576,2020-01-01,1,125,0,5
+Sample2,Benign,532480,2020-01-10,0,200,30,4
+Sample3,Malware,98304,2020-01-15,1,45,0,3
+Sample4,Benign,217088,2020-01-20,0,180,25,5
+Sample5,Malware,65536,2020-01-25,1,80,0,4
