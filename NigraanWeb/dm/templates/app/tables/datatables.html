@@ -17,12 +17,13 @@
 			}
 		});
 	</script>
-
 	<!-- CSS Files -->
 	<link rel="stylesheet" href="../../../static/assets/css/bootstrap.min.css">
 	<link rel="stylesheet" href="../../../static/assets/css/atlantis.min.css">
 	<!-- CSS Just for demo purpose, don't include it in your project -->
 	<link rel="stylesheet" href="../../../static/assets/css/demo.css">
+	<!-- Nigraan Custom CSS -->
+	<link rel="stylesheet" href="../../../static/assets/css/nigraan-custom.css">
     	<script src="../../../static/assets/js/core/jquery.3.2.1.min.js"></script>
 	<script src="../../../static/assets/js/core/popper.min.js"></script>
 	<script src="../../../static/assets/js/core/bootstrap.min.js"></script>
@@ -46,10 +47,9 @@ $(document).ready(function () {
 </script>
 	<div class="wrapper">
 		<div class="main-header">
-			<!-- Logo Header -->
-			<div class="logo-header" data-background-color="blue">
+			<!-- Logo Header -->			<div class="logo-header" data-background-color="blue">
 				
-				<a href="{{ '/analysis' }}" class="logo">
+				<a href="/" class="logo">
 					<img src="../../../static/assets/img/logo.svg" alt="navbar brand" class="navbar-brand">
 				</a>
 				<button class="navbar-toggler sidenav-toggler ml-auto" type="button" data-toggle="collapse" data-target="collapse" aria-expanded="false" aria-label="Toggle navigation">
@@ -137,31 +137,30 @@ $(document).ready(function () {
 		<!-- Sidebar -->
 		<div class="sidebar sidebar-style-2">
 			<div class="sidebar-wrapper scrollbar scrollbar-inner">
-				<div class="sidebar-content">
-					<ul class="nav nav-primary">
+				<div class="sidebar-content">					<ul class="nav nav-primary">
 						<li class="nav-item">
-							<a  href="{{ '/' }}" class="collapsed" aria-expanded="false">
+							<a href="/">
 								<i class="fas fa-home"></i>
 								<p>Analysis board</p>
 								<span class="caret"></span>
 							</a>
 						</li>
 						<li class="nav-item active">
-							<a data-toggle="collapse" href="#">
+							<a href="/dataset">
 								<i class="fas fa-table"></i>
 								<p>DataSet</p>
 								<span class="caret"></span>
 							</a>
 						</li>
 						<li class="nav-item">
-							<a  href="{{ '/learning_board' }}">
+							<a href="/learning_board">
 								<i class="far fa-chart-bar"></i>
 								<p>Learning board</p>
 								<span class="caret"></span>
 							</a>
 						</li>
 						<li class="nav-item">
-							<a href="{{ '/model' }}">
+							<a href="/model">
 								<i class="fas fa-desktop"></i>
 								<p>Model</p>
 							</a>

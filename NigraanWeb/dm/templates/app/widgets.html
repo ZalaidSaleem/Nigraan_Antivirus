@@ -17,20 +17,20 @@
 			}
 		});
 	</script>
-
 	<!-- CSS Files -->
 	<link rel="stylesheet" href="../../static/assets/css/bootstrap.min.css">
 	<link rel="stylesheet" href="../../static/assets/css/atlantis.min.css">
 	<!-- CSS Just for demo purpose, don't include it in your project -->
 	<link rel="stylesheet" href="../../static/assets/css/demo.css">
+	<!-- Nigraan Custom CSS -->
+	<link rel="stylesheet" href="../../static/assets/css/nigraan-custom.css">
 </head>
 <body>
 	<div class="wrapper">	
 		<div class="main-header">
-			<!-- Logo Header -->
-			<div class="logo-header" data-background-color="blue">
+			<!-- Logo Header -->			<div class="logo-header" data-background-color="blue">
 				
-				<a href="index.html" class="logo">
+				<a href="/" class="logo">
 					<img src="../../static/assets/img/logo.svg" alt="navbar brand" class="navbar-brand">
 				</a>
 				<button class="navbar-toggler sidenav-toggler ml-auto" type="button" data-toggle="collapse" data-target="collapse" aria-expanded="false" aria-label="Toggle navigation">
@@ -131,10 +131,9 @@
 						<div class="avatar-sm float-left mr-2">
 							<img src="../../static/assets/img/profile.jpg" alt="..." class="avatar-img rounded-circle">
 						</div>
-					</div>
-					<ul class="nav nav-primary">
+					</div>					<ul class="nav nav-primary">
 						<li class="nav-item">
-							<a data-toggle="collapse" href="{{ '/' }}" class="collapsed" aria-expanded="false">
+							<a href="/">
 								<i class="fas fa-home"></i>
 								<p>Analysis board</p>
 								<span class="caret"></span>
@@ -142,21 +141,21 @@
 						</li>
 
 						<li class="nav-item">
-							<a data-toggle="collapse" href="{{ '/dataset' }}">
+							<a href="/dataset">
 								<i class="fas fa-table"></i>
 								<p>DataSet</p>
 								<span class="caret"></span>
 							</a>
 						</li>
 						<li class="nav-item">
-							<a data-toggle="collapse" href="#{{ '/learning_baord' }}">
+							<a href="/learning_board">
 								<i class="far fa-chart-bar"></i>
 								<p>Learning bord</p>
 								<span class="caret"></span>
 							</a>
 						</li>
 						<li class="nav-item active">
-							<a href="{{ '/model' }}">
+							<a href="/model">
 								<i class="fas fa-desktop"></i>
 								<p>Model</p>
 							</a>
